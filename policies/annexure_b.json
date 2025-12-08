@@ -1,0 +1,54 @@
+{
+    "version": "1.0",
+    "rules": [
+      {
+        "id": "LIN-B-6-a-xx",
+        "name": "Disable SSH Root Login",
+        "description": "Ensure sshd PermitRootLogin is disabled",
+        "severity": "Critical",
+        "platform": "linux",
+        "type": "file_edit",
+        "tags": ["ssh", "network"],
+        "check": {
+          "cmd": "grep",
+          "args": ["^PermitRootLogin no", "/etc/ssh/sshd_config"],
+          "expect_pattern": "PermitRootLogin no"
+        },
+        "remediation": {
+          "type": "file_edit",
+          "file_path": "/etc/ssh/sshd_config",
+          "search_regex": "^#?PermitRootLogin.*",
+          "replace_text": "PermitRootLogin no"
+        },
+        "rollback": {
+          "type": "file_edit",
+          "file_path": "/etc/ssh/sshd_config",
+          "search_regex": "^PermitRootLogin no",
+          "replace_text": "PermitRootLogin yes"
+        }
+      },
+      {
+        "id": "LIN-B-9-a-vi",
+        "name": "Secure Shadow File",
+        "description": "Ensure permissions on /etc/shadow- are configured to 0600 or less",
+        "severity": "High",
+        "platform": "linux",
+        "type": "file_check",
+        "tags": ["filesystem", "permissions"],
+        "check": {
+          "file_path": "/etc/shadow-",
+          "file_mode": "0600"
+        },
+        "remediation": {
+          "type": "command",
+          "cmd": "chmod",
+          "args": ["0600", "/etc/shadow-"]
+        },
+        "rollback": {
+          "type": "command",
+          "cmd": "chmod",
+          "args": ["0640", "/etc/shadow-"]
+        }
+      }
+    ]
+  }
