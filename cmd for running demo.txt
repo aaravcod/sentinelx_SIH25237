@@ -1,0 +1,8 @@
+for sentinel-ui_windows
+run as admin
+
+for hardening-tool_centos
+sudo ./hardening-tool_centos
+
+for hardening-tool_ubuntu
+sudo ./hardening-tool_ubuntu
