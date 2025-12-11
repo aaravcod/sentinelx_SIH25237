@@ -1,0 +1,3723 @@
+{
+    "version": "1.0",
+    "rules": [
+      {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-i",
+      "name": "Set Password Expiration Days",
+      "description": "Ensure PASS_MAX_DAYS is 365 or less",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^PASS_MAX_DAYS 365' /etc/login.defs || echo 'fail'"],
+        "expect_pattern": "PASS_MAX_DAYS 365"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_MAX_DAYS.*",
+        "replace_text": "PASS_MAX_DAYS 365"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_MAX_DAYS 365",
+        "replace_text": "PASS_MAX_DAYS 99999"
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-ii",
+      "name": "Set Minimum Password Days",
+      "description": "Ensure PASS_MIN_DAYS is 1 or more",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^PASS_MIN_DAYS 1' /etc/login.defs || echo 'fail'"],
+        "expect_pattern": "PASS_MIN_DAYS 1"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_MIN_DAYS.*",
+        "replace_text": "PASS_MIN_DAYS 1"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_MIN_DAYS 1",
+        "replace_text": "PASS_MIN_DAYS 0"
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-iii",
+      "name": "Set Password Warning Days",
+      "description": "Ensure PASS_WARN_AGE is 7 or more",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^PASS_WARN_AGE 7' /etc/login.defs || echo 'fail'"],
+        "expect_pattern": "PASS_WARN_AGE 7"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_WARN_AGE.*",
+        "replace_text": "PASS_WARN_AGE 7"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^PASS_WARN_AGE 7",
+        "replace_text": "PASS_WARN_AGE 7"
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-iv",
+      "name": "Strong Password Hashing",
+      "description": "Ensure SHA512 is used for password hashing",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'ENCRYPT_METHOD SHA512' /etc/login.defs || echo 'fail'"],
+        "expect_pattern": "SHA512"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^#?ENCRYPT_METHOD.*",
+        "replace_text": "ENCRYPT_METHOD SHA512"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^ENCRYPT_METHOD SHA512",
+        "replace_text": "ENCRYPT_METHOD SHA512"
+      }
+    },
+   {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-v",
+      "name": "Ensure Inactive Password Lock",
+      "description": "Ensure inactive password lock is 30 days",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'INACTIVE=30' /etc/default/useradd || echo 'fail'"],
+        "expect_pattern": "INACTIVE=30"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "grep -q 'INACTIVE' /etc/default/useradd && sed -i 's/^INACTIVE=.*/INACTIVE=30/' /etc/default/useradd || echo 'INACTIVE=30' >> /etc/default/useradd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sed -i 's/^INACTIVE=30/INACTIVE=-1/' /etc/default/useradd"]
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-vii",
+      "name": "Verify Root UID 0",
+      "description": "Ensure root is the only account with UID 0",
+      "severity": "Critical",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["root", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "awk -F: '($3 == 0) {print $1}' /etc/passwd | grep -v '^root$' && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Remove extra UID 0 accounts immediately"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-ix",
+      "name": "Verify Root GID 0",
+      "description": "Ensure root is the only group with GID 0",
+      "severity": "Critical",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["root", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "awk -F: '($3 == 0) {print $1}' /etc/group | grep -v '^root$' && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Remove extra GID 0 groups immediately"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-xi",
+      "name": "Check Root Path Integrity",
+      "description": "Ensure root PATH does not contain empty or relative directories",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["root", "env"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "echo $PATH | grep -E '::|:.$|^\\.' && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Edit root .bashrc or /etc/profile to fix PATH"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-xii",
+      "name": "Secure Root Umask",
+      "description": "Ensure default umask for root is 027",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["root", "access"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^UMASK.*027' /etc/login.defs || echo 'fail'"],
+        "expect_pattern": "027"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^UMASK.*",
+        "replace_text": "UMASK 027"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/login.defs",
+        "search_regex": "^UMASK 027",
+        "replace_text": "UMASK 022"
+      }
+    },
+    {
+      "category": "7. User Accounts",
+      "id": "LIN-B-7-a-xiii",
+      "name": "Ensure System Accounts No Shell",
+      "description": "System accounts should have /sbin/nologin or /bin/false",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["accounts", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "awk -F: '($3 < 1000 && $7 != \"/usr/sbin/nologin\" && $7 != \"/bin/false\") {print $1}' /etc/passwd | grep -vE 'root|sync|shutdown|halt' && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Run 'usermod -s /usr/sbin/nologin <user>' for flagged accounts"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-ii",
+      "name": "Secure SSH Private Host Keys",
+      "description": "Ensure SSH private host keys are 600",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["ssh", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -perm -0133 2>/dev/null && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "find /etc/ssh -xdev -type f -name 'ssh_host_*_key' -exec chmod 600 {} \\;"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-iii",
+      "name": "Secure SSH Public Host Keys",
+      "description": "Ensure SSH public host keys are 644",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["ssh", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -perm -0133 2>/dev/null && echo 'fail' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "find /etc/ssh -xdev -type f -name 'ssh_host_*_key.pub' -exec chmod 644 {} \\;"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-v",
+      "name": "Set SSH Banner",
+      "description": "Ensure SSH banner is configured",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^Banner /etc/issue.net' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "Banner /etc/issue.net"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?Banner.*",
+        "replace_text": "Banner /etc/issue.net"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^Banner /etc/issue.net",
+        "replace_text": "#Banner none"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-vii",
+      "name": "Set SSH ClientAliveInterval",
+      "description": "Ensure SSH idle timeout is 300 seconds",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^ClientAliveInterval 300' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "ClientAliveInterval 300"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?ClientAliveInterval.*",
+        "replace_text": "ClientAliveInterval 300"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^ClientAliveInterval 300",
+        "replace_text": "ClientAliveInterval 0"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-viii",
+      "name": "Disable SSH TCP Forwarding",
+      "description": "Prevent SSH tunneling",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^AllowTcpForwarding no' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "AllowTcpForwarding no"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?AllowTcpForwarding.*",
+        "replace_text": "AllowTcpForwarding no"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^AllowTcpForwarding no",
+        "replace_text": "AllowTcpForwarding yes"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-ix",
+      "name": "Disable GSSAPI Authentication",
+      "description": "Disable GSSAPI to prevent unnecessary auth vectors",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^GSSAPIAuthentication no' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "GSSAPIAuthentication no"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?GSSAPIAuthentication.*",
+        "replace_text": "GSSAPIAuthentication no"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^GSSAPIAuthentication no",
+        "replace_text": "GSSAPIAuthentication yes"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-x",
+      "name": "Disable Hostbased Authentication",
+      "description": "Prevent trust based on host keys",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^HostbasedAuthentication no' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "HostbasedAuthentication no"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?HostbasedAuthentication.*",
+        "replace_text": "HostbasedAuthentication no"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^HostbasedAuthentication no",
+        "replace_text": "HostbasedAuthentication yes"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xi",
+      "name": "Ignore Rhosts",
+      "description": "Ignore .rhosts files",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^IgnoreRhosts yes' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "IgnoreRhosts yes"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?IgnoreRhosts.*",
+        "replace_text": "IgnoreRhosts yes"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^IgnoreRhosts yes",
+        "replace_text": "IgnoreRhosts no"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xiii",
+      "name": "Set SSH LoginGraceTime",
+      "description": "Ensure login grace time is 60s",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^LoginGraceTime 60' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "LoginGraceTime 60"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?LoginGraceTime.*",
+        "replace_text": "LoginGraceTime 60"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^LoginGraceTime 60",
+        "replace_text": "LoginGraceTime 120"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xvii",
+      "name": "Limit SSH MaxSessions",
+      "description": "Limit concurrent sessions per connection to 4",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^MaxSessions 4' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "MaxSessions 4"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?MaxSessions.*",
+        "replace_text": "MaxSessions 4"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^MaxSessions 4",
+        "replace_text": "MaxSessions 10"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xviii",
+      "name": "Limit SSH MaxStartups",
+      "description": "Limit unauthenticated connections (10:30:60)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^MaxStartups 10:30:60' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "MaxStartups 10:30:60"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?MaxStartups.*",
+        "replace_text": "MaxStartups 10:30:60"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^MaxStartups 10:30:60",
+        "replace_text": "#MaxStartups 10:30:100"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xxi",
+      "name": "Disable SSH User Environment",
+      "description": "Prevent users from setting environment options",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^PermitUserEnvironment no' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "PermitUserEnvironment no"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?PermitUserEnvironment.*",
+        "replace_text": "PermitUserEnvironment no"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^PermitUserEnvironment no",
+        "replace_text": "PermitUserEnvironment yes"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-xxii",
+      "name": "Enable SSH UsePAM",
+      "description": "Ensure PAM is used for SSH authentication",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["ssh"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^UsePAM yes' /etc/ssh/sshd_config || echo 'fail'"],
+        "expect_pattern": "UsePAM yes"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^#?UsePAM.*",
+        "replace_text": "UsePAM yes"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/ssh/sshd_config",
+        "search_regex": "^UsePAM yes",
+        "replace_text": "UsePAM no"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-a-vi",
+      "name": "Configure SSH Ciphers",
+      "description": "Ensure weak ciphers are disabled",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "manual",
+      "tags": ["ssh", "crypto"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sshd -T | grep ciphers | grep -v 'arcfour' && echo 'secure' || echo 'vulnerable'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Edit /etc/ssh/sshd_config to set Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com..."]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },{
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-i",
+      "name": "Ensure Sudo Installed",
+      "description": "Ensure sudo package is installed for controlled privilege escalation",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q sudo && echo 'installed'; else dpkg -s sudo 2>/dev/null | grep 'install ok installed' && echo 'installed'; fi"],
+        "expect_pattern": "installed"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y sudo; else apt-get install -y sudo; fi"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Uninstalling sudo is dangerous and not recommended via automation"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-ii",
+      "name": "Ensure Sudo UsePTY",
+      "description": "Ensure sudo commands run in a pseudo-terminal (prevents background malware injection)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^Defaults usepty' /etc/sudoers || echo 'fail'"],
+        "expect_pattern": "Defaults usepty"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Defaults usepty' >> /etc/sudoers"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/sudoers",
+        "search_regex": "^Defaults usepty",
+        "replace_text": "#Defaults usepty"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-iii",
+      "name": "Verify Sudo Log File",
+      "description": "Ensure sudo log file is configured for auditing",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo", "logging"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'Defaults logfile' /etc/sudoers || echo 'missing'"],
+        "expect_pattern": "Defaults logfile"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Defaults logfile=\"/var/log/sudo.log\"' >> /etc/sudoers"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/sudoers",
+        "search_regex": "^Defaults logfile.*",
+        "replace_text": "#Defaults logfile"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-iv",
+      "name": "Ensure Sudo Password Required",
+      "description": "Ensure 'NOPASSWD' is not set in sudoers",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'NOPASSWD' /etc/sudoers && echo 'vulnerable' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Edit /etc/sudoers to remove 'NOPASSWD' tags"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-vi",
+      "name": "Sudo Authentication Timeout",
+      "description": "Ensure sudo requires re-authentication every 15 minutes",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'Defaults timestamp_timeout=15' /etc/sudoers || echo 'fail'"],
+        "expect_pattern": "Defaults timestamp_timeout=15"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Defaults timestamp_timeout=15' >> /etc/sudoers"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/sudoers",
+        "search_regex": "^Defaults timestamp_timeout=15",
+        "replace_text": "#Defaults timestamp_timeout=15"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-b-vii",
+      "name": "Restrict Access to SU",
+      "description": "Ensure 'su' command is restricted to wheel group",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["sudo", "pam"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'auth required pam_wheel.so use_uid' /etc/pam.d/su || echo 'fail'"],
+        "expect_pattern": "auth required pam_wheel.so use_uid"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'auth required pam_wheel.so use_uid' >> /etc/pam.d/su"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/pam.d/su",
+        "search_regex": "^auth required pam_wheel.so use_uid",
+        "replace_text": "#auth required pam_wheel.so use_uid"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-i-1",
+      "name": "Ensure PAM Runtime Installed",
+      "description": "Ensure libpam-runtime is installed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q pam && echo 'installed'; else dpkg -s libpam-runtime 2>/dev/null | grep 'install ok installed' && echo 'installed'; fi"],
+        "expect_pattern": "installed"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y pam; else apt-get install -y libpam-runtime; fi"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-i-2",
+      "name": "Ensure PAM Modules Installed",
+      "description": "Ensure libpam-modules is installed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q pam && echo 'installed'; else dpkg -s libpam-modules 2>/dev/null | grep 'install ok installed' && echo 'installed'; fi"],
+        "expect_pattern": "installed"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y pam; else apt-get install -y libpam-modules; fi"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-i-3",
+      "name": "Ensure PAM PWQuality Installed",
+      "description": "Ensure libpam-pwquality is installed for password strength",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q libpwquality && echo 'installed'; else dpkg -s libpam-pwquality 2>/dev/null | grep 'install ok installed' && echo 'installed'; fi"],
+        "expect_pattern": "installed"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y libpwquality; else apt-get install -y libpam-pwquality; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y libpwquality; else apt-get remove -y libpam-pwquality; fi"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-ii-1",
+      "name": "Ensure PAM Unix Enabled",
+      "description": "Verify pam_unix.so is present in common-auth",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'pam_unix.so' /etc/pam.d/common-auth || echo 'fail'"],
+        "expect_pattern": "pam_unix.so"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Core authentication module missing. Reinstall PAM."]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-ii-2",
+      "name": "Ensure PAM Faillock Enabled",
+      "description": "Verify pam_faillock.so is configured (prevents brute force)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "lockout"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'pam_faillock.so' /etc/pam.d/common-auth || echo 'fail'"],
+        "expect_pattern": "pam_faillock.so"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Run 'pam-auth-update' and select faillock"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-ii-3",
+      "name": "Ensure PAM PWQuality Enabled",
+      "description": "Verify pam_pwquality.so is configured in common-password",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'pam_pwquality.so' /etc/pam.d/common-password || echo 'fail'"],
+        "expect_pattern": "pam_pwquality.so"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Run 'pam-auth-update' and select pwquality"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+   {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iii-1",
+      "name": "Configure PAM Lockout Deny",
+      "description": "Lock account after 3 failed attempts (deny=3)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "lockout"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep -E '^\\s*deny\\s*=\\s*3' /etc/security/faillock.conf || echo 'fail'"],
+        "expect_pattern": "deny"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "grep -q 'deny' /etc/security/faillock.conf && sed -i 's/^#\\?deny.*/deny = 3/' /etc/security/faillock.conf || echo 'deny = 3' >> /etc/security/faillock.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sed -i 's/^deny = 3/#deny = 3/' /etc/security/faillock.conf"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iii-2",
+      "name": "Configure PAM Unlock Time",
+      "description": "Unlock account after 900 seconds (unlock_time=900)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "lockout"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'unlock_time=' /etc/security/faillock.conf || echo 'fail'"],
+        "expect_pattern": "unlock_time="
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/faillock.conf",
+        "search_regex": "^#?unlock_time.*",
+        "replace_text": "unlock_time = 900"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/faillock.conf",
+        "search_regex": "^unlock_time = 900",
+        "replace_text": "#unlock_time = 600"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iii-3",
+      "name": "PAM Lockout Root",
+      "description": "Ensure root account is also locked after failures (even_deny_root)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "root"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'even_deny_root' /etc/security/faillock.conf || echo 'fail'"],
+        "expect_pattern": "even_deny_root"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "grep -q 'even_deny_root' /etc/security/faillock.conf || echo 'even_deny_root' >> /etc/security/faillock.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/faillock.conf",
+        "search_regex": "^even_deny_root",
+        "replace_text": "#even_deny_root"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-1",
+      "name": "PAM Password Changed Characters",
+      "description": "Ensure 'difok' is set to 2 or more (require character changes)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^difok' /etc/security/pwquality.conf | grep -E '[2-9]|[1-9][0-9]' || echo 'fail'"],
+        "expect_pattern": "difok"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^#?difok.*",
+        "replace_text": "difok = 2"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^difok = 2",
+        "replace_text": "#difok = 1"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-2",
+      "name": "PAM Minimum Password Length",
+      "description": "Ensure 'minlen' is set to 14 or more",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^minlen' /etc/security/pwquality.conf | awk -F= '{if($2>=14) print \"secure\"}' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^#?minlen.*",
+        "replace_text": "minlen = 14"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^minlen = 14",
+        "replace_text": "#minlen = 8"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-3",
+      "name": "PAM Max Repeating Characters",
+      "description": "Ensure 'maxrepeat' is set to 3 or less",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^maxrepeat' /etc/security/pwquality.conf || echo 'fail'"],
+        "expect_pattern": "maxrepeat"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^#?maxrepeat.*",
+        "replace_text": "maxrepeat = 3"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^maxrepeat = 3",
+        "replace_text": "#maxrepeat = 0"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-4",
+      "name": "PAM Max Sequential Characters",
+      "description": "Ensure 'maxsequence' is set to 3 or less (e.g. 1234)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^maxsequence' /etc/security/pwquality.conf || echo 'fail'"],
+        "expect_pattern": "maxsequence"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^#?maxsequence.*",
+        "replace_text": "maxsequence = 3"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^maxsequence = 3",
+        "replace_text": "#maxsequence = 0"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-5",
+      "name": "PAM Dictionary Check",
+      "description": "Ensure 'dictcheck' is enabled (1)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["pam", "password"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^dictcheck = 1' /etc/security/pwquality.conf || echo 'fail'"],
+        "expect_pattern": "dictcheck = 1"
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^#?dictcheck.*",
+        "replace_text": "dictcheck = 1"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^dictcheck = 1",
+        "replace_text": "#dictcheck = 1"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-iv-7",
+      "name": "PAM Enforce for Root",
+      "description": "Ensure 'enforce_for_root' is enabled",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "root"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'enforce_for_root' /etc/security/pwquality.conf || echo 'fail'"],
+        "expect_pattern": "enforce_for_root"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'enforce_for_root' >> /etc/security/pwquality.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/security/pwquality.conf",
+        "search_regex": "^enforce_for_root",
+        "replace_text": "#enforce_for_root"
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-v-1",
+      "name": "PAM Password History",
+      "description": "Ensure 'remember=5' is set in common-password",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "history"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'pam_pwhistory.so' /etc/pam.d/common-password | grep 'remember=' || echo 'fail'"],
+        "expect_pattern": "remember="
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'remember=5' to pam_pwhistory.so line in /etc/pam.d/common-password"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "6. Access Control",
+      "id": "LIN-B-6-c-v-2",
+      "name": "PAM History Root Enforcement",
+      "description": "Ensure 'enforce_for_root' is set for history",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["pam", "history"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'pam_pwhistory.so' /etc/pam.d/common-password | grep 'enforce_for_root' || echo 'fail'"],
+        "expect_pattern": "enforce_for_root"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'enforce_for_root' to pam_pwhistory.so in /etc/pam.d/common-password"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "5. Host Based Firewall",
+      "id": "LIN-B-5-a-i",
+      "name": "Ensure UFW Installed",
+      "description": "Ensure the Uncomplicated Firewall (ufw) is installed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["firewall", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then echo 'secure'; else dpkg -s ufw 2>/dev/null | grep 'install ok installed' && echo 'secure' || echo 'vulnerable'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if ! command -v rpm >/dev/null; then apt-get install -y ufw; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if ! command -v rpm >/dev/null; then apt-get purge -y ufw; fi"]
+      }
+    },
+    {
+      "category": "5. Host Based Firewall",
+      "id": "LIN-B-5-a-ii",
+      "name": "Remove iptables-persistent",
+      "description": "Ensure iptables-persistent is not installed (conflicts with ufw)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["firewall", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "dpkg -s iptables-persistent 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "apt-get purge -y iptables-persistent"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "apt-get install -y iptables-persistent"]
+      }
+    },
+    {
+      "category": "5. Host Based Firewall",
+      "id": "LIN-B-5-a-iv",
+      "name": "Configure UFW Loopback",
+      "description": "Allow traffic on loopback interface (lo)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["firewall"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "ufw status | grep 'ALLOW IN' | grep 'on lo' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "ufw allow in on lo && ufw allow out on lo && ufw deny in from 127.0.0.0/8"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "ufw delete allow in on lo"]
+      }
+    },
+    {
+      "category": "5. Host Based Firewall",
+      "id": "LIN-B-5-a-v",
+      "name": "Configure UFW Outbound",
+      "description": "Ensure outbound connections are configured",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "manual",
+      "tags": ["firewall"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "ufw status verbose | grep 'Default: deny (outgoing)' && echo 'secure' || echo 'vulnerable'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Run 'ufw default deny outgoing' (Warning: This breaks networking if specific ports aren't opened first)"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "5. Host Based Firewall",
+      "id": "LIN-B-5-a-vii",
+      "name": "UFW Default Deny Policy",
+      "description": "Ensure default firewall policy is deny incoming",
+      "severity": "Critical",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["firewall"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "ufw status verbose | grep -i 'Default: deny (incoming)' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "ufw enable && ufw default deny incoming && ufw default allow outgoing"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "ufw default allow incoming"]
+      }
+    },
+  {
+      "category": "4. Network",
+      "id": "LIN-B-4-a-i",
+      "name": "Disable IPv6",
+      "description": "Ensure IPv6 is disabled if not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "ipv6"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv6.conf.all.disable_ipv6 | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "(sysctl -w net.ipv6.conf.all.disable_ipv6=1 || true) && (sysctl -w net.ipv6.conf.default.disable_ipv6=1 || true) && echo 'net.ipv6.conf.all.disable_ipv6 = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv6.conf.all.disable_ipv6=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-a-ii",
+      "name": "Disable Wireless Interfaces",
+      "description": "Ensure wireless interfaces are disabled if not used",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "wireless"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v nmcli >/dev/null; then nmcli radio wifi | grep 'disabled' && echo 'secure' || echo 'vulnerable'; else echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "nmcli radio wifi off"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "nmcli radio wifi on"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-a-iii",
+      "name": "Disable Bluetooth Service",
+      "description": "Ensure bluetooth services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "bluetooth"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active bluetooth || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "bluetooth"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "bluetooth"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-b-i",
+      "name": "Disable DCCP Protocol",
+      "description": "Ensure dccp kernel module is not available",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "network"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'install dccp /bin/true' /etc/modprobe.d/cis_hardening.conf || echo 'fail'"],
+        "expect_pattern": "install dccp /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install dccp /bin/true' >> /etc/modprobe.d/cis_hardening.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install dccp /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-b-ii",
+      "name": "Disable TIPC Protocol",
+      "description": "Ensure tipc kernel module is not available",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "network"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'install tipc /bin/true' /etc/modprobe.d/cis_hardening.conf || echo 'fail'"],
+        "expect_pattern": "install tipc /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install tipc /bin/true' >> /etc/modprobe.d/cis_hardening.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install tipc /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-b-iii",
+      "name": "Disable RDS Protocol",
+      "description": "Ensure rds kernel module is not available",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "network"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'install rds /bin/true' /etc/modprobe.d/cis_hardening.conf || echo 'fail'"],
+        "expect_pattern": "install rds /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install rds /bin/true' >> /etc/modprobe.d/cis_hardening.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install rds /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-b-iv",
+      "name": "Disable SCTP Protocol",
+      "description": "Ensure sctp kernel module is not available",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "network"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'install sctp /bin/true' /etc/modprobe.d/cis_hardening.conf || echo 'fail'"],
+        "expect_pattern": "install sctp /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install sctp /bin/true' >> /etc/modprobe.d/cis_hardening.conf"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install sctp /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-i",
+      "name": "Disable IP Forwarding",
+      "description": "Prevent system from acting as a router",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.ip_forward | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.ip_forward=0 && grep -q 'net.ipv4.ip_forward' /etc/sysctl.conf && sed -i 's/^net.ipv4.ip_forward.*/net.ipv4.ip_forward = 0/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward = 0' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.ip_forward=1"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-ii",
+      "name": "Disable Packet Redirects",
+      "description": "Ensure packet redirect sending is disabled",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.send_redirects | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": [
+          "-c", 
+          "sysctl -w net.ipv4.conf.all.send_redirects=0 && sysctl -w net.ipv4.conf.default.send_redirects=0 && grep -q 'net.ipv4.conf.all.send_redirects' /etc/sysctl.conf && sed -i 's/^net.ipv4.conf.all.send_redirects.*/net.ipv4.conf.all.send_redirects = 0/' /etc/sysctl.conf || echo 'net.ipv4.conf.all.send_redirects = 0' >> /etc/sysctl.conf"
+        ]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.send_redirects=1"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-iii",
+      "name": "Ignore Bogus ICMP Responses",
+      "description": "Prevent bogus ICMP error messages",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.icmp_ignore_bogus_error_responses | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=1 && echo 'net.ipv4.icmp_ignore_bogus_error_responses = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.icmp_ignore_bogus_error_responses=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-iv",
+      "name": "Ignore Broadcast ICMP",
+      "description": "Ensure broadcast ICMP requests are ignored (Smurf attack protection)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.icmp_echo_ignore_broadcasts | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=1 && echo 'net.ipv4.icmp_echo_ignore_broadcasts = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.icmp_echo_ignore_broadcasts=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-v",
+      "name": "Reject ICMP Redirects",
+      "description": "Ensure ICMP redirects are not accepted",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.accept_redirects | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.accept_redirects=0 && sysctl -w net.ipv4.conf.default.accept_redirects=0 && echo 'net.ipv4.conf.all.accept_redirects = 0' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.accept_redirects=1"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xi",
+      "name": "Reject Secure ICMP Redirects",
+      "description": "Ensure secure ICMP redirects are not accepted",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.secure_redirects | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.secure_redirects=0 && echo 'net.ipv4.conf.all.secure_redirects = 0' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.secure_redirects=1"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xii",
+      "name": "Enable Reverse Path Filtering",
+      "description": "Ensure reverse path filtering is enabled (Anti-Spoofing)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.rp_filter | awk '{print $3}' | grep '^1$' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.rp_filter=1 && echo 'net.ipv4.conf.all.rp_filter = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.rp_filter=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xiii",
+      "name": "Reject Source Routed Packets",
+      "description": "Ensure source routed packets are not accepted",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.accept_source_route | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.accept_source_route=0 && echo 'net.ipv4.conf.all.accept_source_route = 0' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.accept_source_route=1"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xiv",
+      "name": "Log Suspicious Packets",
+      "description": "Ensure suspicious packets are logged (log_martians)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.conf.all.log_martians | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.log_martians=1 && echo 'net.ipv4.conf.all.log_martians = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.conf.all.log_martians=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xv",
+      "name": "Enable TCP SYN Cookies",
+      "description": "Ensure tcp syn cookies is enabled to protect against SYN flood",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "sysctl"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv4.tcp_syncookies | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.tcp_syncookies=1 && echo 'net.ipv4.tcp_syncookies = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv4.tcp_syncookies=0"]
+      }
+    },
+    {
+      "category": "4. Network",
+      "id": "LIN-B-4-c-xvi",
+      "name": "Reject IPv6 Router Advertisements",
+      "description": "Ensure ipv6 router advertisements are not accepted",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["network", "ipv6"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl net.ipv6.conf.all.accept_ra | grep ' = 0' || echo 'fail'"],
+        "expect_pattern": " = 0"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv6.conf.all.accept_ra=0 && echo 'net.ipv6.conf.all.accept_ra = 0' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w net.ipv6.conf.all.accept_ra=1"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-i",
+      "name": "Disable Autofs",
+      "description": "Ensure autofs services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active autofs 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "autofs"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "autofs"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-ii",
+      "name": "Disable Avahi Daemon",
+      "description": "Ensure avahi-daemon services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active avahi-daemon 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "avahi-daemon"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "avahi-daemon"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-iii",
+      "name": "Disable DHCP Server",
+      "description": "Ensure isc-dhcp-server services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active isc-dhcp-server 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "isc-dhcp-server"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "isc-dhcp-server"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-iv",
+      "name": "Disable DNS Server",
+      "description": "Ensure bind9/named services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active bind9 || systemctl is-active named || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "systemctl disable --now bind9 2>/dev/null; systemctl disable --now named 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "systemctl enable --now bind9 2>/dev/null; systemctl enable --now named 2>/dev/null"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-v",
+      "name": "Disable DNSMasq",
+      "description": "Ensure dnsmasq services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active dnsmasq 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "dnsmasq"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "dnsmasq"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-vi",
+      "name": "Disable FTP Server",
+      "description": "Ensure vsftpd services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active vsftpd 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "vsftpd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "vsftpd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-vii",
+      "name": "Disable LDAP Server",
+      "description": "Ensure slapd services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active slapd 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "slapd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "slapd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-ix",
+      "name": "Disable NFS Server",
+      "description": "Ensure nfs-server services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active nfs-server 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "nfs-server"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "nfs-server"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xi",
+      "name": "Disable Print Server",
+      "description": "Ensure cups services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active cups 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "cups"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "cups"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xii",
+      "name": "Disable RPCbind",
+      "description": "Ensure rpcbind services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active rpcbind 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "rpcbind"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "rpcbind"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xiii",
+      "name": "Disable Rsync",
+      "description": "Ensure rsync services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active rsync 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "rsync"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "rsync"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xiv",
+      "name": "Disable Samba",
+      "description": "Ensure smbd services are not in use",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active smbd 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "smbd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "smbd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xv",
+      "name": "Disable SNMP",
+      "description": "Ensure snmpd services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active snmpd 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "snmpd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "snmpd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xviii",
+      "name": "Disable Web Server",
+      "description": "Ensure httpd/apache2/nginx services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active apache2 || systemctl is-active httpd || systemctl is-active nginx || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Web server detected. Only disable if this is NOT a web server."]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xix",
+      "name": "Disable Xinetd",
+      "description": "Ensure xinetd services are not in use",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active xinetd 2>/dev/null || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "xinetd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "xinetd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-a-xxi",
+      "name": "Configure Mail Transfer Agent",
+      "description": "Ensure MTA is configured for local-only mode (listen on 127.0.0.1)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "mail"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "ss -lntu | grep ':25' | grep -v '127.0.0.1' && echo 'vulnerable' || echo 'secure'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Configure Postfix/Exim to bind to loopback interface only."]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-i",
+      "name": "Uninstall NIS Client",
+      "description": "Ensure NIS Client (nis) is not installed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q ypbind && echo 'vulnerable' || echo 'secure'; else dpkg -s nis 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y ypbind; else apt-get purge -y nis; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y ypbind; else apt-get install -y nis; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-ii",
+      "name": "Uninstall RSH Client",
+      "description": "Ensure rsh-client is not installed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q rsh && echo 'vulnerable' || echo 'secure'; else dpkg -s rsh-client 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y rsh; else apt-get purge -y rsh-client; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y rsh; else apt-get install -y rsh-client; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-iii",
+      "name": "Uninstall Talk Client",
+      "description": "Ensure talk client is not installed",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q talk && echo 'vulnerable' || echo 'secure'; else dpkg -s talk 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y talk; else apt-get purge -y talk; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y talk; else apt-get install -y talk; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-iv",
+      "name": "Uninstall Telnet Client",
+      "description": "Ensure telnet client is removed",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q telnet && echo 'vulnerable' || echo 'secure'; else dpkg -s telnet 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y telnet; else apt-get purge -y telnet; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y telnet; else apt-get install -y telnet; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-v",
+      "name": "Uninstall LDAP Client",
+      "description": "Ensure ldap-utils is not installed",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q openldap-clients && echo 'vulnerable' || echo 'secure'; else dpkg -s ldap-utils 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y openldap-clients; else apt-get purge -y ldap-utils; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y openldap-clients; else apt-get install -y ldap-utils; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-b-vi",
+      "name": "Uninstall FTP Client",
+      "description": "Ensure ftp client is not installed",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "packages"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if command -v rpm >/dev/null; then rpm -q ftp && echo 'vulnerable' || echo 'secure'; else dpkg -s ftp 2>/dev/null | grep 'install ok installed' && echo 'vulnerable' || echo 'secure'; fi"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum remove -y ftp; else apt-get purge -y ftp; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v yum >/dev/null; then yum install -y ftp; else apt-get install -y ftp; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-c-i",
+      "name": "Ensure Time Synchronization",
+      "description": "Ensure systemd-timesyncd or ntp is active",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["time", "services"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active systemd-timesyncd || systemctl is-active ntp || systemctl is-active chronyd || echo 'inactive'"],
+        "expect_pattern": "active"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "systemctl unmask systemd-timesyncd && systemctl enable --now systemd-timesyncd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "systemctl disable --now systemd-timesyncd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-d-i",
+      "name": "Configure Time Server",
+      "description": "Ensure systemd-timesyncd has a valid NTP server",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "file_edit",
+      "tags": ["time"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^NTP=' /etc/systemd/timesyncd.conf || echo 'fail'"],
+        "expect_pattern": "NTP="
+      },
+      "remediation": {
+        "type": "file_edit",
+        "file_path": "/etc/systemd/timesyncd.conf",
+        "search_regex": "^#?NTP=.*",
+        "replace_text": "NTP=time.google.com"
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/systemd/timesyncd.conf",
+        "search_regex": "^NTP=time.google.com",
+        "replace_text": "#NTP="
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-e-i",
+      "name": "Configure Chrony Server",
+      "description": "Ensure chrony is configured with authorized servers",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["time", "chrony"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^server' /etc/chrony/chrony.conf 2>/dev/null || grep '^server' /etc/chrony.conf 2>/dev/null || echo 'fail'"],
+        "expect_pattern": "server"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if [ -d /etc/chrony ]; then echo 'server time.google.com iburst' >> /etc/chrony/chrony.conf; else echo 'server time.google.com iburst' >> /etc/chrony.conf; fi"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Remove added server line from chrony config"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-e-iii",
+      "name": "Enable Chrony Service",
+      "description": "Ensure chrony is enabled and running",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["time", "chrony"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active chronyd || echo 'inactive'"],
+        "expect_pattern": "active"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "chronyd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "chronyd"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-f-i",
+      "name": "Enable Cron Daemon",
+      "description": "Ensure cron daemon is enabled and active",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["cron", "scheduling"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active cron || systemctl is-active crond || echo 'inactive'"],
+        "expect_pattern": "active"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v apt-get >/dev/null; then systemctl enable --now cron; else systemctl enable --now crond; fi"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "if command -v apt-get >/dev/null; then systemctl disable --now cron; else systemctl disable --now crond; fi"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-f-ii",
+      "name": "Secure /etc/crontab",
+      "description": "Ensure permissions on /etc/crontab are 600",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["cron", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/crontab | grep 600 || echo 'fail'"],
+        "expect_pattern": "600"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["600", "/etc/crontab"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["644", "/etc/crontab"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-f-iii",
+      "name": "Secure /etc/cron.hourly",
+      "description": "Ensure permissions on /etc/cron.hourly are 700",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["cron", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/cron.hourly | grep 700 || echo 'fail'"],
+        "expect_pattern": "700"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["700", "/etc/cron.hourly"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["755", "/etc/cron.hourly"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-f-iv",
+      "name": "Secure /etc/cron.daily",
+      "description": "Ensure permissions on /etc/cron.daily are 700",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["cron", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/cron.daily | grep 700 || echo 'fail'"],
+        "expect_pattern": "700"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["700", "/etc/cron.daily"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["755", "/etc/cron.daily"]
+      }
+    },
+    {
+      "category": "3. Services",
+      "id": "LIN-B-3-f-v",
+      "name": "Secure /etc/cron.weekly",
+      "description": "Ensure permissions on /etc/cron.weekly are 700",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["cron", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/cron.weekly | grep 700 || echo 'fail'"],
+        "expect_pattern": "700"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["700", "/etc/cron.weekly"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["755", "/etc/cron.weekly"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-a-i",
+      "name": "Set Bootloader Password",
+      "description": "Ensure GRUB bootloader password is set",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["bootloader", "grub"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep '^password_pbkdf2' /boot/grub/grub.cfg 2>/dev/null || echo 'fail'"],
+        "expect_pattern": "password_pbkdf2"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Run 'grub-mkpasswd-pbkdf2' and configure /etc/grub.d/40_custom"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-a-ii",
+      "name": "Secure Bootloader Config",
+      "description": "Ensure permissions on grub.cfg are 600",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["bootloader", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /boot/grub/grub.cfg 2>/dev/null || echo '600'"],
+        "expect_pattern": "600"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["600", "/boot/grub/grub.cfg"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["644", "/boot/grub/grub.cfg"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-b-i",
+      "name": "Enable ASLR",
+      "description": "Ensure address space layout randomization is enabled",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "aslr"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl kernel.randomize_va_space | grep ' = 2' || echo 'fail'"],
+        "expect_pattern": " = 2"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w kernel.randomize_va_space=2 && echo 'kernel.randomize_va_space = 2' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w kernel.randomize_va_space=0"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-b-ii",
+      "name": "Restrict Ptrace Scope",
+      "description": "Ensure ptrace_scope is restricted",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "ptrace"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "sysctl kernel.yama.ptrace_scope | grep ' = 1' || echo 'fail'"],
+        "expect_pattern": " = 1"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w kernel.yama.ptrace_scope=1 && echo 'kernel.yama.ptrace_scope = 1' >> /etc/sysctl.conf"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "sysctl -w kernel.yama.ptrace_scope=0"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-b-v",
+      "name": "Disable Automatic Error Reporting",
+      "description": "Ensure Apport/ABRT is not enabled",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["services", "error-reporting"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "systemctl is-active apport || systemctl is-active abrt-ccpp || echo 'inactive'"],
+        "expect_pattern": "inactive"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["disable", "--now", "apport"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "systemctl",
+        "args": ["enable", "--now", "apport"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-c-i",
+      "name": "Configure Local Login Banner",
+      "description": "Ensure /etc/issue is configured",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["banner", "compliance"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'Authorized uses only' /etc/issue || echo 'fail'"],
+        "expect_pattern": "Authorized uses only"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Authorized uses only. All activity may be monitored and reported.' > /etc/issue"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Ubuntu \\n \\l' > /etc/issue"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-c-ii",
+      "name": "Configure Remote Login Banner",
+      "description": "Ensure /etc/issue.net is configured",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["banner", "compliance"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "grep 'Authorized uses only' /etc/issue.net || echo 'fail'"],
+        "expect_pattern": "Authorized uses only"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Authorized uses only. All activity may be monitored and reported.' > /etc/issue.net"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'Ubuntu \\n \\l' > /etc/issue.net"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-c-iii",
+      "name": "Secure /etc/motd Permissions",
+      "description": "Ensure /etc/motd permissions are 644",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["banner", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "if [ -f /etc/motd ]; then stat -c %a /etc/motd | grep 644 || echo 'fail'; else echo '644'; fi"],
+        "expect_pattern": "644"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "[ -f /etc/motd ] && chmod 644 /etc/motd"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "[ -f /etc/motd ] && chmod 666 /etc/motd"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-c-iv",
+      "name": "Secure /etc/issue Permissions",
+      "description": "Ensure /etc/issue permissions are 644",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["banner", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/issue | grep 644 || echo 'fail'"],
+        "expect_pattern": "644"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["644", "/etc/issue"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["666", "/etc/issue"]
+      }
+    },
+    {
+      "category": "2. Package Management",
+      "id": "LIN-B-2-c-v",
+      "name": "Secure /etc/issue.net Permissions",
+      "description": "Ensure /etc/issue.net permissions are 644",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["banner", "permissions"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "stat -c %a /etc/issue.net | grep 644 || echo 'fail'"],
+        "expect_pattern": "644"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["644", "/etc/issue.net"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "chmod",
+        "args": ["666", "/etc/issue.net"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-i",
+      "name": "Disable cramfs",
+      "description": "Prevent mounting of cramfs filesystems",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v cramfs | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install cramfs /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r cramfs 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install cramfs /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-ii",
+      "name": "Disable freevxfs",
+      "description": "Prevent mounting of freevxfs filesystems",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v freevxfs | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install freevxfs /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r freevxfs 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install freevxfs /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-iii",
+      "name": "Disable hfs",
+      "description": "Prevent mounting of hfs filesystems (Apple legacy)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v hfs | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install hfs /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r hfs 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install hfs /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-iv",
+      "name": "Disable hfsplus",
+      "description": "Prevent mounting of hfsplus filesystems (Apple)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v hfsplus | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install hfsplus /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r hfsplus 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install hfsplus /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-v",
+      "name": "Disable jffs2",
+      "description": "Prevent mounting of jffs2 filesystems",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v jffs2 | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install jffs2 /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r jffs2 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install jffs2 /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-vi",
+      "name": "Disable overlayfs",
+      "description": "Prevent mounting of overlayfs (Warning: Breaks Docker)",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v overlay | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install overlay /bin/true' >> /etc/modprobe.d/cis_hardening.conf && (modprobe -r overlay 2>/dev/null || true)"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install overlay /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-vii",
+      "name": "Disable squashfs",
+      "description": "Prevent mounting of squashfs (used by Snap/LiveCDs)",
+      "severity": "Low",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v squashfs | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install squashfs /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r squashfs 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install squashfs /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-viii",
+      "name": "Disable udf",
+      "description": "Prevent mounting of udf filesystems",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v udf | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install udf /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r udf 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install udf /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-a-ix",
+      "name": "Disable USB Storage",
+      "description": "Prevent loading of usb-storage kernel module",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["kernel", "usb"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "modprobe -n -v usb-storage | grep 'install /bin/true' || echo 'fail'"],
+        "expect_pattern": "install /bin/true"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "echo 'install usb-storage /bin/true' >> /etc/modprobe.d/cis_hardening.conf && modprobe -r usb-storage 2>/dev/null"]
+      },
+      "rollback": {
+        "type": "file_edit",
+        "file_path": "/etc/modprobe.d/cis_hardening.conf",
+        "search_regex": "install usb-storage /bin/true",
+        "replace_text": ""
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-b-i",
+      "name": "Ensure /tmp is a Separate Partition",
+      "description": "Prevent /tmp filling up from crashing the root system",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /tmp | grep '/tmp' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-b-ii",
+      "name": "Set nodev on /tmp",
+      "description": "Ensure nodev option set on /tmp partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /tmp | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-b-iii",
+      "name": "Set nosuid on /tmp",
+      "description": "Ensure nosuid option set on /tmp partition",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /tmp | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-b-iv",
+      "name": "Set noexec on /tmp",
+      "description": "Ensure noexec option set on /tmp partition (prevents running binaries)",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /tmp | grep noexec || echo 'fail'"],
+        "expect_pattern": "noexec"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'noexec' to /tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-c-i",
+      "name": "Ensure /dev/shm is Separate",
+      "description": "Ensure /dev/shm is a separate partition (tmpfs)",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /dev/shm | grep tmpfs && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: /dev/shm should be mounted as tmpfs by default"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-c-ii",
+      "name": "Set nodev on /dev/shm",
+      "description": "Ensure nodev option set on /dev/shm partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /dev/shm | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,nodev /dev/shm"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,dev /dev/shm"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-c-iii",
+      "name": "Set nosuid on /dev/shm",
+      "description": "Ensure nosuid option set on /dev/shm partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /dev/shm | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,nosuid /dev/shm"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,suid /dev/shm"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-c-iv",
+      "name": "Set noexec on /dev/shm",
+      "description": "Ensure noexec option set on /dev/shm partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /dev/shm | grep noexec || echo 'fail'"],
+        "expect_pattern": "noexec"
+      },
+      "remediation": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,noexec /dev/shm"]
+      },
+      "rollback": {
+        "type": "command",
+        "cmd": "bash",
+        "args": ["-c", "mount -o remount,exec /dev/shm"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-d-i",
+      "name": "Ensure /home is Separate",
+      "description": "Ensure /home is a separate partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /home | grep '/home' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-d-ii",
+      "name": "Set nodev on /home",
+      "description": "Ensure nodev option set on /home partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /home | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /home in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-d-iii",
+      "name": "Set nosuid on /home",
+      "description": "Ensure nosuid option set on /home partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /home | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /home in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-e-i",
+      "name": "Ensure /var is Separate",
+      "description": "Ensure /var is a separate partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /var | grep '/var' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-e-ii",
+      "name": "Set nodev on /var",
+      "description": "Ensure nodev option set on /var partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /var in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-e-iii",
+      "name": "Set nosuid on /var",
+      "description": "Ensure nosuid option set on /var partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /var in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-f-i",
+      "name": "Ensure /var/tmp is Separate",
+      "description": "Ensure /var/tmp is a separate partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /var/tmp | grep '/var/tmp' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-f-ii",
+      "name": "Set nodev on /var/tmp",
+      "description": "Ensure nodev option set on /var/tmp partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/tmp | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /var/tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-f-iii",
+      "name": "Set nosuid on /var/tmp",
+      "description": "Ensure nosuid option set on /var/tmp partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/tmp | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /var/tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-f-iv",
+      "name": "Set noexec on /var/tmp",
+      "description": "Ensure noexec option set on /var/tmp partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/tmp | grep noexec || echo 'fail'"],
+        "expect_pattern": "noexec"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'noexec' to /var/tmp in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-g-i",
+      "name": "Ensure /var/log is Separate",
+      "description": "Ensure /var/log is a separate partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /var/log | grep '/var/log' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-g-ii",
+      "name": "Set nodev on /var/log",
+      "description": "Ensure nodev option set on /var/log partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /var/log in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-g-iii",
+      "name": "Set nosuid on /var/log",
+      "description": "Ensure nosuid option set on /var/log partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /var/log in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-g-iv",
+      "name": "Set noexec on /var/log",
+      "description": "Ensure noexec option set on /var/log partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log | grep noexec || echo 'fail'"],
+        "expect_pattern": "noexec"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'noexec' to /var/log in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-h-i",
+      "name": "Ensure /var/log/audit is Separate",
+      "description": "Ensure /var/log/audit is a separate partition",
+      "severity": "High",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt /var/log/audit | grep '/var/log/audit' && echo 'secure' || echo 'fail'"],
+        "expect_pattern": "secure"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Partitioning requires OS re-installation or LVM configuration"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-h-ii",
+      "name": "Set nodev on /var/log/audit",
+      "description": "Ensure nodev option set on /var/log/audit partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log/audit | grep nodev || echo 'fail'"],
+        "expect_pattern": "nodev"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nodev' to /var/log/audit in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-h-iii",
+      "name": "Set nosuid on /var/log/audit",
+      "description": "Ensure nosuid option set on /var/log/audit partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log/audit | grep nosuid || echo 'fail'"],
+        "expect_pattern": "nosuid"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'nosuid' to /var/log/audit in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    },
+    {
+      "category": "1. Filesystem",
+      "id": "LIN-B-1-h-iv",
+      "name": "Set noexec on /var/log/audit",
+      "description": "Ensure noexec option set on /var/log/audit partition",
+      "severity": "Medium",
+      "platform": "linux",
+      "type": "command",
+      "tags": ["filesystem", "audit"],
+      "check": {
+        "cmd": "bash",
+        "args": ["-c", "findmnt -n /var/log/audit | grep noexec || echo 'fail'"],
+        "expect_pattern": "noexec"
+      },
+      "remediation": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual: Add 'noexec' to /var/log/audit in /etc/fstab and remount"]
+      },
+      "rollback": {
+        "type": "manual",
+        "cmd": "echo",
+        "args": ["Manual rollback"]
+      }
+    }
+
+    ]
+  }
